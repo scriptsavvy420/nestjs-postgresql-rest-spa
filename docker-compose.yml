@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+  # NestJs API
+  nestjs-api:
+    build:
+      dockerfile: Dockerfile
+      context: ./nestjs-api
+      # Only build development stage from Dockerfile
+      target: development
+    # Mount host dir to the docker container
+    # Mount nestjs-api directory (./nestjs-api) to (:) docker container (/myapps/src/app)
+    # Reflect File changes from host to container
+    volumes:
+      - ./nestjs-api:/myapps/src/app
+      - /myapps/src/app/node_modules/
+    # RUN in debug mode: npm run start:debug --> Also start your editor/IDE debugger
+    # RUN in dev mode: npm run start:dev
+    command: npm run start:dev
+    depends_on:
+      - postgres
+    environment:
+      DATAB ASE_URL: postgres://user:password@postgres:5432/db
+      NODE_ENV: development
+      JWT_SECRET: hard_to_guess_secret_123
+      PORT: 5000
+    ports:
+      - 5000:5000
+      - 9229:9229
+
+  # Angular SPA
+  angular-spa:
+    build:
+      dockerfile: Dockerfile
+      context: ./angular-spa
+      target: development
+    command: npm run start
+    volumes:
+      - ./angular-spa:/myapps/angular-app/src/app
+      - /myapps/angular-spa/src/app/nodemodules
+    ports:
+      - 4200:4200
+    links:
+      - nestjs-api
+
+  # postgres Database for NestJs
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db
+    ports:
+      - 35000:5432
+
+  # Postgres Admin tool if we want to run some custom queries
+  postgres-admin:
+    image: dpage/pgadmin4
+    depends_on:
+      - postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    ports:
+      - 5050:80
