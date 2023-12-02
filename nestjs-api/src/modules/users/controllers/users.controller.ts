@@ -8,8 +8,22 @@ import { CreateUserRequestDto } from '@src/modules/users/dtos/create-user-reques
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
+  /**
+   * Creates a new instance of the class.
+   *
+   * @param {CommandBus} commandBus - The command bus instance to be injected.
+   */
   constructor(private commandBus: CommandBus) {}
 
+  /**
+   * Create a new user
+   *
+   * This method creates a new user using the provided user information.
+   *
+   * @param {CreateUserRequestDto} createUserRequestDto - The user information to create a new user.
+   *
+   * @returns {Promise<UserDto>} - The created user object.
+   */
   @Post('create')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

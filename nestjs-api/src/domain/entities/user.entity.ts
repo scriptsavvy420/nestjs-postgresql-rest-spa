@@ -11,6 +11,18 @@ export class User extends BaseEntity {
 
   @AutoMap()
   @Column({
+    length: 254,
+  })
+  email: string;
+
+  @Column({
+    length: 128,
+    select: false,
+  })
+  password: string;
+
+  @AutoMap()
+  @Column({
     name: 'first_name',
     length: 254,
   })
